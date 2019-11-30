@@ -4,6 +4,12 @@
 constexpr auto PI = 3.14159265f;
 
 // Variaveis Globais
+int refreshMillis = 30;
+int windowWidth = 640;
+int windowHeight = 480;
+int windowPosX = 50;
+int windowPosY = 50;
+
 GLfloat ballRadius = 0.1f;
 GLfloat ballX = 0.0f;
 GLfloat ballY = 0.0f;
@@ -11,16 +17,12 @@ GLfloat ballXMax, ballXMin, ballYMax, ballYMin;
 GLfloat xSpeed = 0.025f;
 GLfloat	ySpeed = 0.025f;
 
-int refreshMillis = 30;
-int windowWidth = 640;
-int windowHeight = 480;
-int windowPosX = 50;
-int windowPosY = 50;
-
-bool fullScreenMode = false;
-
 // Area de projeçao
 GLdouble clipAreaXLeft, clipAreaXRight, clipAreaYBottom, clipAreaYTop;
+
+bool fullScreenMode = false;
+bool paused = false;
+GLfloat xSpeedSaved, ySpeedSaved;
 
 // Inicializar OpenGL
 void initGL() {
@@ -106,6 +108,7 @@ void reshape(GLsizei width, GLsizei height) {
 	ballYMax = clipAreaYTop - ballRadius;
 }
 
+// Activar ou desativar Fullscreen Mode
 void toggleFullScreen() {
 	fullScreenMode = !fullScreenMode;
 	if (fullScreenMode) {
@@ -121,10 +124,29 @@ void toggleFullScreen() {
 	}
 }
 
-void specialKeys(int key, int x, int y) {
+void pauseGame() {
+	paused = !paused;
+	if (paused) {
+		xSpeedSaved = xSpeed;
+		ySpeedSaved = ySpeed;
+		xSpeed = 0;
+		ySpeed = 0;
+	}
+	else {
+		xSpeed = xSpeedSaved;
+		ySpeed = ySpeedSaved;
+	}
+}
+
+void keyboard(unsigned char key, int x, int y) {
 	switch (key) {
-	case GLUT_KEY_F1:    // F1: Activar ou desativar Fullscreen Mode
+	case 'F': // F: activar ou desativar Fullscreen Mode
+	case 'f':
 		toggleFullScreen();
+		break;
+	case 'P':
+	case 'p':
+		pauseGame();
 		break;
 	}
 }
@@ -144,7 +166,7 @@ int main(int argc, char** argv) {
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 	glutTimerFunc(0, timer, 0);
-	glutSpecialFunc(specialKeys);
+	glutKeyboardFunc(keyboard);
 	initGL();
 	glutMainLoop();
 	return 0;
