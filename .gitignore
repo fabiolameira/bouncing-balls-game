@@ -1,1 +1,7 @@
 BouncingBallsGame/.vs/
+*.log
+*.obj
+*.idb
+*.pdb
+*.exe
+*.ilk
