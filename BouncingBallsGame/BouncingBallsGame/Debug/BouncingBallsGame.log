@@ -1,0 +1,8 @@
+﻿  main.cpp
+D:\BouncingBallsGame\Git\BouncingBallsGame\main.cpp(42,50): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+D:\BouncingBallsGame\Git\BouncingBallsGame\main.cpp(42,25): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+D:\BouncingBallsGame\Git\BouncingBallsGame\main.cpp(96,27): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
+D:\BouncingBallsGame\Git\BouncingBallsGame\main.cpp(97,28): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
+D:\BouncingBallsGame\Git\BouncingBallsGame\main.cpp(98,29): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
+D:\BouncingBallsGame\Git\BouncingBallsGame\main.cpp(99,26): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
+  BouncingBallsGame.vcxproj -> D:\BouncingBallsGame\Git\BouncingBallsGame\Debug\BouncingBallsGame.exe
