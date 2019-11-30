@@ -10,7 +10,14 @@ GLfloat ballY = 0.0f;
 GLfloat ballXMax, ballXMin, ballYMax, ballYMin;
 GLfloat xSpeed = 0.025f;
 GLfloat	ySpeed = 0.025f;
+
 int refreshMillis = 30;
+int windowWidth = 640;
+int windowHeight = 480;
+int windowPosX = 50;
+int windowPosY = 50;
+
+bool fullScreenMode = false;
 
 // Area de projeçao
 GLdouble clipAreaXLeft, clipAreaXRight, clipAreaYBottom, clipAreaYTop;
@@ -99,15 +106,33 @@ void reshape(GLsizei width, GLsizei height) {
 	ballYMax = clipAreaYTop - ballRadius;
 }
 
+void toggleFullScreen() {
+	fullScreenMode = !fullScreenMode;
+	if (fullScreenMode) {
+		windowPosX = glutGet(GLUT_WINDOW_X);
+		windowPosY = glutGet(GLUT_WINDOW_Y);
+		windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+		windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+		glutFullScreen();
+	}
+	else {
+		glutReshapeWindow(windowWidth, windowHeight);
+		glutPositionWindow(windowPosX, windowPosX);
+	}
+}
+
+void specialKeys(int key, int x, int y) {
+	switch (key) {
+	case GLUT_KEY_F1:    // F1: Activar ou desativar Fullscreen Mode
+		toggleFullScreen();
+		break;
+	}
+}
+
 void timer(int value) {
 	glutPostRedisplay();
 	glutTimerFunc(refreshMillis, timer, 0);
 }
-
-int windowWidth = 640;
-int windowHeight = 480;
-int windowPosX = 50;
-int windowPosY = 50;
 
 // Função Main
 int main(int argc, char** argv) {
@@ -119,6 +144,7 @@ int main(int argc, char** argv) {
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 	glutTimerFunc(0, timer, 0);
+	glutSpecialFunc(specialKeys);
 	initGL();
 	glutMainLoop();
 	return 0;
