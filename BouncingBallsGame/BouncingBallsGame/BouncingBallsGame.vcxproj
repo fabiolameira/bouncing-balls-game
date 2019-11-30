@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{D04AF1C4-20FF-4699-B019-6880850B307F}</ProjectGuid>
+    <ProjectGuid>{74AA6755-9535-4306-8EF9-2699D95A0F75}</ProjectGuid>
     <RootNamespace>BouncingBallsGame</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
