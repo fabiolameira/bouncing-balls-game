@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <stdio.h>
 #include <GL/glut.h>
 #include <Math.h>
 constexpr auto PI = 3.14159265f;
@@ -17,7 +18,7 @@ GLfloat ballXMax, ballXMin, ballYMax, ballYMin;
 GLfloat xSpeed = 0.025f;
 GLfloat	ySpeed = 0.025f;
 
-// Area de projeçao
+// Area de projecao
 GLdouble clipAreaXLeft, clipAreaXRight, clipAreaYBottom, clipAreaYTop;
 
 bool fullScreenMode = false;
@@ -29,16 +30,12 @@ void initGL() {
 	glClearColor(0.0, 0.0, 0.0, 1.0); // Cor de fundo
 }
 
-// Mostrar Janela
-void display() {
-	glClear(GL_COLOR_BUFFER_BIT);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+// Formar um circulo com segmentos triangulares
+void generateBall() {
 
 	// Traduzir valores para coordenada x e y
 	glTranslatef(ballX, ballY, 0.0f);
 
-	// Formar um circulo com segmentos triangulares
 	glBegin(GL_TRIANGLE_FAN);
 	glColor3f(0.0f, 0.0f, 1.0f); // Azul
 	glVertex2f(0.0f, 0.0f);		 // Centro do circulo
@@ -52,14 +49,14 @@ void display() {
 	}
 
 	glEnd();
+}
 
-	glutSwapBuffers();
-
-	// Controlo da animação - Posição de x e y para o proximo refresh
+// Atualizar posicao e velocidade da bola
+void update() {
 	ballX += xSpeed;
 	ballY += ySpeed;
 
-	// Verificar se a posição da bola está fora dos limites da janela
+	// Verificar se a posicao da bola está fora dos limites da janela
 	if (ballX > ballXMax) {
 		ballX = ballXMax;
 		xSpeed = -xSpeed;
@@ -76,6 +73,22 @@ void display() {
 		ballY = ballYMin;
 		ySpeed = -ySpeed;
 	}
+}
+
+// Mostrar Janela
+void display() {
+
+	glClear(GL_COLOR_BUFFER_BIT);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	// Formar um circulo com segmentos triangulares
+	generateBall();
+
+	// Controlo da animacao - Posicao de x e y para o proximo refresh
+	update();
+
+	glutSwapBuffers();
 
 }
 
@@ -86,7 +99,7 @@ void reshape(GLsizei width, GLsizei height) {
 
 	glViewport(0, 0, width, height);
 
-	// Definir a proporção da da janela
+	// Definir a proporcao da da janela
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	if (width >= height) {
@@ -124,6 +137,7 @@ void toggleFullScreen() {
 	}
 }
 
+// Funcao para pausar o jogo
 void pauseGame() {
 	paused = !paused;
 	if (paused) {
@@ -138,25 +152,37 @@ void pauseGame() {
 	}
 }
 
+// Leitor de inputs do teclado
 void keyboard(unsigned char key, int x, int y) {
 	switch (key) {
-	case 'F': // F: activar ou desativar Fullscreen Mode
+	case 'F': // F: Activa ou desativa Fullscreen Mode
 	case 'f':
 		toggleFullScreen();
 		break;
-	case 'P':
+	case 'P': // P: Pausar e retomar o jogo
 	case 'p':
 		pauseGame();
+		break;
+	case 27: // ESC: Sai do jogo
+		exit(0);
 		break;
 	}
 }
 
+// Leitor de inputs do mouse
+void mouse(int button, int state, int x, int y) {
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+		printf("Position do rato: (%i,%i)\n", x, y);
+	}
+}
+
+// Timer para renderizar imagem
 void timer(int value) {
 	glutPostRedisplay();
 	glutTimerFunc(refreshMillis, timer, 0);
 }
 
-// Função Main
+// Funcao Main
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE);
@@ -167,6 +193,7 @@ int main(int argc, char** argv) {
 	glutReshapeFunc(reshape);
 	glutTimerFunc(0, timer, 0);
 	glutKeyboardFunc(keyboard);
+	glutMouseFunc(mouse);
 	initGL();
 	glutMainLoop();
 	return 0;
