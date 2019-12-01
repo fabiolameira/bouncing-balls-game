@@ -5,3 +5,4 @@ BouncingBallsGame/.vs/
 *.pdb
 *.exe
 *.ilk
+*.tlog
