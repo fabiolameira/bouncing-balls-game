@@ -13,21 +13,6 @@ int windowHeight = 480;
 int windowPosX = 50;
 int windowPosY = 50;
 
-GLfloat ballRadius = 0.1f;
-GLfloat ballX = 0.0f;
-GLfloat ballY = 0.0f;
-GLfloat ballXMax, ballXMin, ballYMax, ballYMin;
-GLfloat xSpeed = 0.025f;
-GLfloat	ySpeed = 0.025f;
-
-// Area de projecao
-GLdouble clipAreaXLeft, clipAreaXRight, clipAreaYBottom, clipAreaYTop;
-
-bool fullScreenMode = false;
-bool paused = false;
-GLfloat xSpeedSaved, ySpeedSaved;
-
-
 class MyVector {
 public:
 	float x;
