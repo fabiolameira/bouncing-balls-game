@@ -22,18 +22,18 @@ public:
 	float y;
 
 	MyVector() {
-		x = 0;
-		y = 0;
+		this->x = 0;
+		this->y = 0;
 	}
 
-	MyVector(float _x, float _y) {
-		x = _x;
-		y = _y;
+	MyVector(float x, float y) {
+		this->x = x;
+		this->y = y;
 	}
 
 	void sum(MyVector v) {
-		x += v.x;
-		y += v.y;
+		this->x += v.x;
+		this->y += v.y;
 	}
 };
 
@@ -52,13 +52,13 @@ private:
 
 public:
 	Ball() {
-		position = MyVector(200, 200);
-		speed = MyVector(random(-10, 10), random(-10, 10));
-		radius = 15;
-		color[0] = 100 / 100.0;//R
-		color[1] = 0 / 100.0;//G
-		color[2] = 0 / 100.0;//B
-		lifes = 3;
+		this->position = MyVector(200, 200);
+		this->speed = MyVector(random(-10, 10), random(-10, 10));
+		this->radius = 15;
+		this->color[0] = 100 / 100.0;//R
+		this->color[1] = 0 / 100.0;//G
+		this->color[2] = 0 / 100.0;//B
+		this->lifes = 3;
 	}
 
 	void drawBall() {
@@ -74,7 +74,7 @@ public:
 		glEnd();
 	}
 
-	void checkPosition() { // Completar
+	void checkPosition() {
 
 		if (position.y <= radius) {
 			position.y = radius;
@@ -106,7 +106,7 @@ public:
 	void stopBallMovement() {
 		this->speedSaved = speed;
 		this->speed = MyVector(0, 0);
-		printf("Ball position: (%f,%f)\n", position.x, (windowHeight - position.y));
+		// printf("Ball position: (%f,%f)\n", position.x, (windowHeight - position.y));
 	}
 
 	void resumeBallMovement() {
