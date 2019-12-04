@@ -14,6 +14,8 @@ int windowHeight = 480;
 int windowPosX = 50;
 int windowPosY = 50;
 
+bool isPaused = false;
+
 class MyVector {
 public:
 	float x;
@@ -39,6 +41,7 @@ class Ball {
 private:
 	MyVector position;
 	MyVector speed;
+	MyVector speedSaved;
 	float radius;
 	float color[3];
 	int lifes;
@@ -55,16 +58,6 @@ public:
 		color[0] = 100 / 100.0;//R
 		color[1] = 0 / 100.0;//G
 		color[2] = 0 / 100.0;//B
-		lifes = 3;
-	}
-
-	Ball(int _x, int _y) {
-		position = MyVector(_x, _y);
-		speed = MyVector(random(-5, 5), random(-5, 5));
-		radius = 15;
-		color[0] = 50 / 100.0;//R
-		color[1] = 50 / 100.0;//G
-		color[2] = 50 / 100.0;//B
 		lifes = 3;
 	}
 
@@ -109,9 +102,52 @@ public:
 		position.sum(speed);
 		checkPosition();
 	}
+
+	void stopBallMovement() {
+		this->speedSaved = speed;
+		this->speed = MyVector(0, 0);
+		printf("Ball position: (%f,%f)\n", position.x, (windowHeight - position.y));
+	}
+
+	void resumeBallMovement() {
+		this->speed = speedSaved;
+	}
 };
 
 std::vector<Ball> balls;
+
+void pauseGame() {
+	isPaused = !isPaused;
+	if (isPaused) {
+		for (int i = 0; i < balls.size(); i++) {
+			balls[i].stopBallMovement();
+		}
+	}
+	else {
+		for (int i = 0; i < balls.size(); i++) {
+			balls[i].resumeBallMovement();
+		}
+	}
+}
+
+void mouse(int button, int state, int x, int y) {
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+		printf("Mouse position: (%f,%f)\n", (float) x, (float) y);
+	}
+}
+
+void keyboard(unsigned char key, int x, int y) {
+	switch (key) {
+	case 'P': // P: Pausar e retomar o jogo
+	case 'p':
+		pauseGame();
+		break;
+	case 'Q':
+	case 'q':
+		exit(0);
+		break;
+	}
+}
 
 void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -161,6 +197,8 @@ int main(int argc, char* argv[]) {
 	gluOrtho2D(0, windowWidth, 0, windowHeight);
 	glutDisplayFunc(display);
 	glutTimerFunc(0, timer, 0);
+	glutMouseFunc(mouse);
+	glutKeyboardFunc(keyboard);
 	glutMainLoop();
 	return 0;
 }
