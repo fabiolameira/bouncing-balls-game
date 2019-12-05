@@ -108,6 +108,12 @@ public:
 			speed.x = -speed.x;
 		}
 
+		if (lifes == 2) {
+			color[0] = 100 / 100.0;//R
+			color[1] = 100 / 100.0;//G
+			color[2] = 0 / 100.0;//B
+		}
+
 		if (lifes == 0) {
 			color[0] = 100 / 100.0;//R
 			color[1] = 0 / 100.0;//G
@@ -225,14 +231,14 @@ void init() {
 
 }
 
-void timer(int value) {
+void refresh(int value) {
 
 	for (size_t i = 0; i < balls.size(); i++) {
 		balls[i].moveBall();
 	}
 
 	glutPostRedisplay();
-	glutTimerFunc(refreshMillis, timer, 0);
+	glutTimerFunc(refreshMillis, refresh, 0);
 }
 
 int main(int argc, char* argv[]) {
@@ -247,7 +253,7 @@ int main(int argc, char* argv[]) {
 	glLoadIdentity();
 	gluOrtho2D(0, windowWidth, 0, windowHeight);
 	glutDisplayFunc(display);
-	glutTimerFunc(0, timer, 0);
+	glutTimerFunc(0, refresh, 0);
 	glutMouseFunc(mouse);
 	glutKeyboardFunc(keyboard);
 	glutMainLoop();
