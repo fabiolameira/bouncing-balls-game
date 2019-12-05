@@ -53,12 +53,20 @@ private:
 public:
 	Ball() {
 		this->position = MyVector(200, 200);
-		this->speed = MyVector(random(-10, 10), random(-10, 10));
+		changeBallSpeed();
 		this->radius = 15;
 		this->color[0] = 100 / 100.0;//R
 		this->color[1] = 0 / 100.0;//G
 		this->color[2] = 0 / 100.0;//B
 		this->lifes = 3;
+	}
+
+	MyVector getPosition() {
+		return this->position;
+	}
+
+	float getRadius() {
+		return this->radius;
 	}
 
 	void drawBall() {
@@ -74,7 +82,7 @@ public:
 		glEnd();
 	}
 
-	void checkPosition() {
+	void checkWallCollisions() {
 
 		if (position.y <= radius) {
 			position.y = radius;
@@ -100,17 +108,20 @@ public:
 
 	void moveBall() {
 		position.sum(speed);
-		checkPosition();
+		checkWallCollisions();
 	}
 
 	void stopBallMovement() {
 		this->speedSaved = speed;
 		this->speed = MyVector(0, 0);
-		// printf("Ball position: (%f,%f)\n", position.x, (windowHeight - position.y));
 	}
 
 	void resumeBallMovement() {
 		this->speed = speedSaved;
+	}
+
+	void changeBallSpeed() {
+		this->speed = MyVector(random(-5, 5), random(-5, 5));
 	}
 };
 
@@ -119,20 +130,51 @@ std::vector<Ball> balls;
 void pauseGame() {
 	isPaused = !isPaused;
 	if (isPaused) {
-		for (int i = 0; i < balls.size(); i++) {
+		for (size_t i = 0; i < balls.size(); i++) {
 			balls[i].stopBallMovement();
 		}
 	}
 	else {
-		for (int i = 0; i < balls.size(); i++) {
+		for (size_t i = 0; i < balls.size(); i++) {
 			balls[i].resumeBallMovement();
 		}
 	}
 }
 
+void verifyClickCoords(int xMouse, int yMouse) {
+	
+	yMouse = windowHeight - yMouse;
+
+	for (size_t i = 0; i < balls.size(); i++) {
+
+		float xResult;
+		float yResult;
+
+		if (xMouse > balls[i].getPosition().x) {
+			xResult = xMouse - balls[i].getPosition().x;
+		}
+		else {
+			xResult = balls[i].getPosition().x - xMouse;
+		}
+
+		if (xResult <= (balls[i].getRadius())) {
+			if (yMouse > balls[i].getPosition().y) {
+				yResult = yMouse - balls[i].getPosition().y;
+			}
+			else {
+				yResult = balls[i].getPosition().y - yMouse;
+			}
+
+			if (yResult <= (balls[i].getRadius())) {
+				balls[i].changeBallSpeed();
+			}
+		}
+	}
+}
+
 void mouse(int button, int state, int x, int y) {
-	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-		printf("Mouse position: (%f,%f)\n", (float) x, (float) y);
+	if (!isPaused && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+		verifyClickCoords(x, y);
 	}
 }
 
@@ -152,7 +194,7 @@ void keyboard(unsigned char key, int x, int y) {
 void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	for (int i = 0; i < balls.size(); i++) {
+	for (size_t i = 0; i < balls.size(); i++) {
 		balls[i].drawBall();
 	}
 
@@ -173,10 +215,9 @@ void init() {
 
 }
 
-// Timer para renderizar imagem
 void timer(int value) {
 
-	for (int i = 0; i < balls.size(); i++) {
+	for (size_t i = 0; i < balls.size(); i++) {
 		balls[i].moveBall();
 	}
 
