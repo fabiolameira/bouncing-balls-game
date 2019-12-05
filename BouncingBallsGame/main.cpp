@@ -55,18 +55,18 @@ public:
 		this->position = MyVector(200, 200);
 		changeBallSpeed();
 		this->radius = 15;
-		this->color[0] = 100 / 100.0;//R
-		this->color[1] = 0 / 100.0;//G
+		this->color[0] = 0 / 100.0;//R
+		this->color[1] = 100 / 100.0;//G
 		this->color[2] = 0 / 100.0;//B
 		this->lifes = 3;
 	}
 
 	MyVector getPosition() {
-		return this->position;
+		return position;
 	}
 
 	float getRadius() {
-		return this->radius;
+		return radius;
 	}
 
 	void drawBall() {
@@ -85,23 +85,33 @@ public:
 	void checkWallCollisions() {
 
 		if (position.y <= radius) {
+			lifes--;
 			position.y = radius;
 			speed.y = -speed.y;
 		}
 
 		if (position.y >= windowHeight - radius) {
+			lifes--;
 			position.y = windowHeight - radius;
 			speed.y = -speed.y;
 		}
 
 		if (position.x >= windowWidth - radius) {
+			lifes--;
 			position.x = windowWidth - radius;
 			speed.x = -speed.x;
 		}
 
 		if (position.x <= radius) {
+			lifes--;
 			position.x = radius;
 			speed.x = -speed.x;
+		}
+
+		if (lifes == 0) {
+			color[0] = 100 / 100.0;//R
+			color[1] = 0 / 100.0;//G
+			color[2] = 0 / 100.0;//B
 		}
 
 	}
@@ -112,16 +122,16 @@ public:
 	}
 
 	void stopBallMovement() {
-		this->speedSaved = speed;
-		this->speed = MyVector(0, 0);
+		speedSaved = speed;
+		speed = MyVector(0, 0);
 	}
 
 	void resumeBallMovement() {
-		this->speed = speedSaved;
+		speed = speedSaved;
 	}
 
 	void changeBallSpeed() {
-		this->speed = MyVector(random(-5, 5), random(-5, 5));
+		speed = MyVector(random(-5, 5), random(-5, 5));
 	}
 };
 
