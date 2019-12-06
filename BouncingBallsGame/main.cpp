@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <GL/glut.h>
 #include <Math.h>
-#include<vector>
+#include <vector>
 constexpr auto PI = 3.14159265f;
 
 // Variaveis Globais
@@ -52,7 +52,7 @@ private:
 
 public:
 	Ball() {
-		this->position = MyVector(200, 200);
+		this->position = MyVector(320, 240);
 		changeBallSpeed();
 		this->radius = 15;
 		this->color[0] = 0 / 100.0;//R
@@ -67,6 +67,10 @@ public:
 
 	float getRadius() {
 		return radius;
+	}
+
+	int getLifes() {
+		return lifes;
 	}
 
 	void drawBall() {
@@ -85,41 +89,34 @@ public:
 	void checkWallCollisions() {
 
 		if (position.y <= radius) {
-			lifes--;
 			position.y = radius;
 			speed.y = -speed.y;
-		}
-
-		if (position.y >= windowHeight - radius) {
 			lifes--;
-			position.y = windowHeight - radius;
-			speed.y = -speed.y;
-		}
-
-		if (position.x >= windowWidth - radius) {
-			lifes--;
-			position.x = windowWidth - radius;
-			speed.x = -speed.x;
 		}
 
 		if (position.x <= radius) {
-			lifes--;
 			position.x = radius;
 			speed.x = -speed.x;
+			lifes--;
+		}
+
+		if (position.y >= windowHeight - radius) {
+			position.y = windowHeight - radius;
+			speed.y = -speed.y;
+			lifes--;
+		}
+
+		if (position.x >= windowWidth - radius) {
+			position.x = windowWidth - radius;
+			speed.x = -speed.x;
+			lifes--;
 		}
 
 		if (lifes == 2) {
-			color[0] = 100 / 100.0;//R
-			color[1] = 100 / 100.0;//G
-			color[2] = 0 / 100.0;//B
-		}
-
-		if (lifes == 0) {
-			color[0] = 100 / 100.0;//R
+			color[0] = 0 / 100.0;//R
 			color[1] = 0 / 100.0;//G
-			color[2] = 0 / 100.0;//B
+			color[2] = 100 / 100.0;//B
 		}
-
 	}
 
 	void moveBall() {
@@ -139,6 +136,7 @@ public:
 	void changeBallSpeed() {
 		speed = MyVector(random(-5, 5), random(-5, 5));
 	}
+
 };
 
 std::vector<Ball> balls;
@@ -174,6 +172,7 @@ void verifyClickCoords(int xMouse, int yMouse) {
 		}
 
 		if (xResult <= (balls[i].getRadius())) {
+
 			if (yMouse > balls[i].getPosition().y) {
 				yResult = yMouse - balls[i].getPosition().y;
 			}
@@ -191,6 +190,7 @@ void verifyClickCoords(int xMouse, int yMouse) {
 void mouse(int button, int state, int x, int y) {
 	if (!isPaused && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
 		verifyClickCoords(x, y);
+		printf("Mouse position: (%f,%f)\n", (float)x, (float)y);
 	}
 }
 
@@ -218,27 +218,35 @@ void display() {
 
 }
 
+void refresh(int value) {
+
+	for (size_t i = 0; i < balls.size(); i++) {
+		balls[i].moveBall();
+
+		if (balls[i].getLifes() == 0) {
+			balls.erase(balls.begin() + i);
+		}
+	}
+
+	glutPostRedisplay();
+	glutTimerFunc(refreshMillis, refresh, 0);
+}
+
 void init() {
 
 	Ball b = Ball();
 	Ball bb = Ball();
 	Ball bbb = Ball();
 	Ball bbbb = Ball();
+	Ball bbbbb = Ball();
+	Ball bbbbbb = Ball();
+
 	balls.push_back(b);
 	balls.push_back(bb);
 	balls.push_back(bbb);
 	balls.push_back(bbbb);
-
-}
-
-void refresh(int value) {
-
-	for (size_t i = 0; i < balls.size(); i++) {
-		balls[i].moveBall();
-	}
-
-	glutPostRedisplay();
-	glutTimerFunc(refreshMillis, refresh, 0);
+	balls.push_back(bbbbb);
+	balls.push_back(bbbbbb);
 }
 
 int main(int argc, char* argv[]) {
