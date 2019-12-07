@@ -13,8 +13,8 @@ int windowWidth = 640;
 int windowHeight = 480;
 int windowPosX = 50;
 int windowPosY = 50;
-
 bool isPaused = false;
+int numberOfBalls = 8;
 
 class MyVector {
 public:
@@ -52,7 +52,7 @@ private:
 
 public:
 	Ball() {
-		this->position = MyVector(320, 240);
+		this->position = MyVector(random(1, 640), random(1, 480));
 		changeBallSpeed();
 		this->radius = 15;
 		this->color[0] = 0 / 100.0;//R
@@ -65,12 +65,20 @@ public:
 		return position;
 	}
 
+	MyVector getSpeed() {
+		return speed;
+	}
+
 	float getRadius() {
 		return radius;
 	}
 
 	int getLifes() {
 		return lifes;
+	}
+
+	void setSpeed(MyVector speed) {
+		this->speed = speed;
 	}
 
 	void drawBall() {
@@ -116,6 +124,12 @@ public:
 			color[0] = 0 / 100.0;//R
 			color[1] = 0 / 100.0;//G
 			color[2] = 100 / 100.0;//B
+		}
+
+		if (lifes == 0) {
+			color[0] = 100 / 100.0;//R
+			color[1] = 0 / 100.0;//G
+			color[2] = 0 / 100.0;//B
 		}
 	}
 
@@ -223,8 +237,23 @@ void refresh(int value) {
 	for (size_t i = 0; i < balls.size(); i++) {
 		balls[i].moveBall();
 
-		if (balls[i].getLifes() == 0) {
-			balls.erase(balls.begin() + i);
+		if (numberOfBalls > 1) {
+			for (int collide = i + 1; collide < numberOfBalls; collide++) {
+
+				int minusXPosition = balls[i].getPosition().x - balls[collide].getPosition().x;
+				int minusYPosition = balls[i].getPosition().y - balls[collide].getPosition().y;
+				int distance = int(sqrt(pow(minusXPosition, 2) + pow(minusYPosition, 2)));
+
+				if (distance < (balls[i].getRadius() + balls[collide].getRadius())) {
+
+					MyVector tempSpeed = balls[collide].getSpeed();
+
+					balls[collide].setSpeed(balls[i].getSpeed());
+					balls[i].setSpeed(tempSpeed);
+
+				}
+
+			}
 		}
 	}
 
@@ -234,19 +263,11 @@ void refresh(int value) {
 
 void init() {
 
-	Ball b = Ball();
-	Ball bb = Ball();
-	Ball bbb = Ball();
-	Ball bbbb = Ball();
-	Ball bbbbb = Ball();
-	Ball bbbbbb = Ball();
+	for (int i = 0; i < numberOfBalls; i++) {
+		Ball b = Ball();
+		balls.push_back(b);
+	}
 
-	balls.push_back(b);
-	balls.push_back(bb);
-	balls.push_back(bbb);
-	balls.push_back(bbbb);
-	balls.push_back(bbbbb);
-	balls.push_back(bbbbbb);
 }
 
 int main(int argc, char* argv[]) {
