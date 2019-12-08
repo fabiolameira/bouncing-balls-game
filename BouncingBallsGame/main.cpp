@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <GL/glut.h>
 #include <Math.h>
-#include <vector>
 constexpr auto PI = 3.14159265f;
 
 // Variaveis Globais
@@ -65,8 +64,16 @@ public:
 		return position;
 	}
 
+	void setPosition(MyVector position) {
+		this->position = position;
+	}
+
 	MyVector getSpeed() {
 		return speed;
+	}
+
+	void setSpeed(MyVector speed) {
+		this->speed = speed;
 	}
 
 	float getRadius() {
@@ -75,10 +82,6 @@ public:
 
 	int getLifes() {
 		return lifes;
-	}
-
-	void setSpeed(MyVector speed) {
-		this->speed = speed;
 	}
 
 	void drawBall() {
@@ -96,34 +99,42 @@ public:
 
 	void checkWallCollisions() {
 
-		if (position.y <= radius) {
-			position.y = radius;
-			speed.y = -speed.y;
-			lifes--;
-		}
-
 		if (position.x <= radius) {
 			position.x = radius;
 			speed.x = -speed.x;
 			lifes--;
 		}
+		else {
+			if (position.x >= windowWidth - radius) {
+				position.x = windowWidth - radius;
+				speed.x = -speed.x;
+				lifes--;
+			}
+		}
 
-		if (position.y >= windowHeight - radius) {
-			position.y = windowHeight - radius;
+		if (position.y <= radius) {
+			position.y = radius;
 			speed.y = -speed.y;
 			lifes--;
 		}
-
-		if (position.x >= windowWidth - radius) {
-			position.x = windowWidth - radius;
-			speed.x = -speed.x;
-			lifes--;
+		else {
+			if (position.y >= windowHeight - radius) {
+				position.y = windowHeight - radius;
+				speed.y = -speed.y;
+				lifes--;
+			}
 		}
 
 		if (lifes == 2) {
 			color[0] = 0 / 100.0;//R
 			color[1] = 0 / 100.0;//G
 			color[2] = 100 / 100.0;//B
+		}
+
+		if (lifes == 1) {
+			color[0] = 100 / 100.0;//R
+			color[1] = 100 / 100.0;//G
+			color[2] = 0 / 100.0;//B
 		}
 
 		if (lifes == 0) {
@@ -148,22 +159,22 @@ public:
 	}
 
 	void changeBallSpeed() {
-		speed = MyVector(random(-5, 5), random(-5, 5));
+		this->speed = MyVector(random(-5, 5), random(-5, 5));
 	}
 
 };
 
-std::vector<Ball> balls;
+Ball* balls = new Ball[numberOfBalls];
 
 void pauseGame() {
 	isPaused = !isPaused;
 	if (isPaused) {
-		for (size_t i = 0; i < balls.size(); i++) {
+		for (int i = 0; i < numberOfBalls; i++) {
 			balls[i].stopBallMovement();
 		}
 	}
 	else {
-		for (size_t i = 0; i < balls.size(); i++) {
+		for (int i = 0; i < numberOfBalls; i++) {
 			balls[i].resumeBallMovement();
 		}
 	}
@@ -173,7 +184,7 @@ void verifyClickCoords(int xMouse, int yMouse) {
 	
 	yMouse = windowHeight - yMouse;
 
-	for (size_t i = 0; i < balls.size(); i++) {
+	for (int i = 0; i < numberOfBalls; i++) {
 
 		float xResult;
 		float yResult;
@@ -222,9 +233,10 @@ void keyboard(unsigned char key, int x, int y) {
 }
 
 void display() {
+
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	for (size_t i = 0; i < balls.size(); i++) {
+	for (int i = 0; i < numberOfBalls; i++) {
 		balls[i].drawBall();
 	}
 
@@ -234,21 +246,22 @@ void display() {
 
 void refresh(int value) {
 
-	for (size_t i = 0; i < balls.size(); i++) {
+	for (int i = 0; i < numberOfBalls; i++) {
+
 		balls[i].moveBall();
 
 		if (numberOfBalls > 1) {
-			for (int collide = i + 1; collide < numberOfBalls; collide++) {
+			for (int j = i + 1; j < numberOfBalls; j++) {
 
-				int minusXPosition = balls[i].getPosition().x - balls[collide].getPosition().x;
-				int minusYPosition = balls[i].getPosition().y - balls[collide].getPosition().y;
+				int minusXPosition = balls[i].getPosition().x - balls[j].getPosition().x;
+				int minusYPosition = balls[i].getPosition().y - balls[j].getPosition().y;
 				int distance = int(sqrt(pow(minusXPosition, 2) + pow(minusYPosition, 2)));
 
-				if (distance < (balls[i].getRadius() + balls[collide].getRadius())) {
+				if (distance < (balls[i].getRadius() + balls[j].getRadius())) {
 
-					MyVector tempSpeed = balls[collide].getSpeed();
+					MyVector tempSpeed = balls[j].getSpeed();
 
-					balls[collide].setSpeed(balls[i].getSpeed());
+					balls[j].setSpeed(balls[i].getSpeed());
 					balls[i].setSpeed(tempSpeed);
 
 				}
@@ -265,7 +278,7 @@ void init() {
 
 	for (int i = 0; i < numberOfBalls; i++) {
 		Ball b = Ball();
-		balls.push_back(b);
+		balls[i] = b;
 	}
 
 }
