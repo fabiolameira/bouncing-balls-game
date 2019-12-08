@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <GL/glut.h>
 #include <Math.h>
+
 constexpr auto PI = 3.14159265f;
 
 // Variaveis Globais
@@ -13,7 +14,9 @@ int windowHeight = 480;
 int windowPosX = 50;
 int windowPosY = 50;
 bool isPaused = false;
-int numberOfBalls = 8;
+int numberOfBalls = 5;
+int ballsWithoutLifes = 0;
+float pontuation = 0;
 
 class MyVector {
 public:
@@ -80,6 +83,10 @@ public:
 		return radius;
 	}
 
+	void setRadius(float radius) {
+		this->radius = radius;
+	}
+
 	int getLifes() {
 		return lifes;
 	}
@@ -126,21 +133,49 @@ public:
 		}
 
 		if (lifes == 2) {
-			color[0] = 0 / 100.0;//R
-			color[1] = 0 / 100.0;//G
-			color[2] = 100 / 100.0;//B
-		}
-
-		if (lifes == 1) {
 			color[0] = 100 / 100.0;//R
 			color[1] = 100 / 100.0;//G
 			color[2] = 0 / 100.0;//B
 		}
 
-		if (lifes == 0) {
+		if (lifes == 1) {
 			color[0] = 100 / 100.0;//R
 			color[1] = 0 / 100.0;//G
 			color[2] = 0 / 100.0;//B
+		}
+
+		if (lifes == 0) {
+			ballsWithoutLifes += 1;
+		}
+
+	}
+
+	void checkClickCoordinades(int xMouse, int yMouse) {
+
+		yMouse = windowHeight - yMouse;
+
+		float xResult;
+		float yResult;
+
+		if (xMouse > speed.x) {
+			xResult = xMouse - position.x;
+		}
+		else {
+			xResult = position.x - xMouse;
+		}
+
+		if (xResult <= radius) {
+
+			if (yMouse > position.y) {
+				yResult = yMouse - position.y;
+			}
+			else {
+				yResult = position.y - yMouse;
+			}
+
+			if (yResult <= radius) {
+				changeBallSpeed();
+			}
 		}
 	}
 
@@ -180,42 +215,11 @@ void pauseGame() {
 	}
 }
 
-void verifyClickCoords(int xMouse, int yMouse) {
-	
-	yMouse = windowHeight - yMouse;
-
-	for (int i = 0; i < numberOfBalls; i++) {
-
-		float xResult;
-		float yResult;
-
-		if (xMouse > balls[i].getPosition().x) {
-			xResult = xMouse - balls[i].getPosition().x;
-		}
-		else {
-			xResult = balls[i].getPosition().x - xMouse;
-		}
-
-		if (xResult <= (balls[i].getRadius())) {
-
-			if (yMouse > balls[i].getPosition().y) {
-				yResult = yMouse - balls[i].getPosition().y;
-			}
-			else {
-				yResult = balls[i].getPosition().y - yMouse;
-			}
-
-			if (yResult <= (balls[i].getRadius())) {
-				balls[i].changeBallSpeed();
-			}
-		}
-	}
-}
-
 void mouse(int button, int state, int x, int y) {
 	if (!isPaused && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-		verifyClickCoords(x, y);
-		printf("Mouse position: (%f,%f)\n", (float)x, (float)y);
+		for (int i = 0; i < numberOfBalls; i++) {
+			balls[i].checkClickCoordinades(x, y);
+		}
 	}
 }
 
@@ -246,28 +250,40 @@ void display() {
 
 void refresh(int value) {
 
+	pontuation += 0.01f;
 	for (int i = 0; i < numberOfBalls; i++) {
 
-		balls[i].moveBall();
+		if (balls[i].getLifes() <= 0) {
+			balls[i].setRadius(0);
+		}
+		else {
+			balls[i].moveBall();
 
-		if (numberOfBalls > 1) {
-			for (int j = i + 1; j < numberOfBalls; j++) {
+			if (numberOfBalls > 1) {
+				for (int j = i + 1; j < numberOfBalls; j++) {
 
-				int minusXPosition = balls[i].getPosition().x - balls[j].getPosition().x;
-				int minusYPosition = balls[i].getPosition().y - balls[j].getPosition().y;
-				int distance = int(sqrt(pow(minusXPosition, 2) + pow(minusYPosition, 2)));
+					int minusXPosition = balls[i].getPosition().x - balls[j].getPosition().x;
+					int minusYPosition = balls[i].getPosition().y - balls[j].getPosition().y;
+					int distance = int(sqrt(pow(minusXPosition, 2) + pow(minusYPosition, 2)));
 
-				if (distance < (balls[i].getRadius() + balls[j].getRadius())) {
+					if (distance < (balls[i].getRadius() + balls[j].getRadius())) {
 
-					MyVector tempSpeed = balls[j].getSpeed();
+						MyVector tempSpeed = balls[j].getSpeed();
 
-					balls[j].setSpeed(balls[i].getSpeed());
-					balls[i].setSpeed(tempSpeed);
+						balls[j].setSpeed(balls[i].getSpeed());
+						balls[i].setSpeed(tempSpeed);
+
+					}
 
 				}
-
 			}
 		}
+
+	}
+
+	if (ballsWithoutLifes == numberOfBalls) {
+		printf("Game Over! You have made: (%f) points :)\n", (float) pontuation);
+		exit(0);
 	}
 
 	glutPostRedisplay();
